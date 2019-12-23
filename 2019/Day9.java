@@ -2,6 +2,7 @@ package adventofcode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,10 +12,10 @@ import java.util.List;
 public class Day9 {
     public static void main(String[] args) {
         Computer computer = new Computer(INPUT);
-        System.out.println(computer.compute(Arrays.asList(2L)));
+        System.out.println(computer.compute(Collections.singletonList(2L)));
     }
 
-    private static class Computer {
+    public static class Computer {
         final long[] tape;
         int position = 0;
         int inputPosition = 0;
@@ -23,6 +24,26 @@ public class Day9 {
 
         Computer(long[] program) {
             this.tape = Arrays.copyOf(program, 1 << 16);
+        }
+
+        void addInput(List<Long> newInput) {
+            input.addAll(newInput);
+        }
+
+        Output compute() {
+            return compute(Collections.emptyList());
+        }
+
+        Output compute(long newInput) {
+            return compute(Collections.singletonList(newInput));
+        }
+
+        Output compute(String newInputAscii) {
+            List<Long> input = new ArrayList<>(newInputAscii.length());
+            for (char character : newInputAscii.toCharArray()) {
+                input.add((long) character);
+            }
+            return compute(input);
         }
 
         Output compute(List<Long> newInput) {
@@ -114,13 +135,27 @@ public class Day9 {
             }
         }
 
-        private static class Output {
+        public static class Output {
             final List<Long> output;
             final boolean halted;
 
             public Output(List<Long> output, boolean halted) {
                 this.output = output;
                 this.halted = halted;
+            }
+
+            public String toAscii() {
+                StringBuilder sb = new StringBuilder();
+                for (Long num : output) {
+                    if (num <= 256) {
+                        sb.append((char) num.intValue());
+                    } else {
+                        sb.append('{');
+                        sb.append(num);
+                        sb.append('}');
+                    }
+                }
+                return sb.toString();
             }
 
             @Override

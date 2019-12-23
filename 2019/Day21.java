@@ -1,8 +1,5 @@
 package adventofcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Sun on 12/21/2019.
  * Springdroid Adventure
@@ -29,12 +26,8 @@ public class Day21 {
     static void part2() {
         Day9.Computer computer = new Day9.Computer(INPUT);
         String code = code2 + "RUN\n";
-        List<Long> input = new ArrayList<>(code.length());
-        for (char character : code.toCharArray()) {
-            input.add((long) character);
-        }
-        Day9.Computer.Output output = computer.compute(input);
-        System.out.println(parse(output.output));
+        Day9.Computer.Output output = computer.compute(code);
+        System.out.println(output.toAscii());
     }
 
     static String code1 = "NOT A T\n" +
@@ -48,24 +41,8 @@ public class Day21 {
     static void part1() {
         Day9.Computer computer = new Day9.Computer(INPUT);
         String code = code1 + "WALK\n";
-        List<Long> input = new ArrayList<>(code.length());
-        for (char character : code.toCharArray()) {
-            input.add((long) character);
-        }
-        Day9.Computer.Output output = computer.compute(input);
-        System.out.println(parse(output.output));
-    }
-
-    static String parse(List<Long> longs) {
-        StringBuilder sb = new StringBuilder();
-        for (Long num : longs) {
-            if (num <= 256) {
-                sb.append((char) num.intValue());
-            } else {
-                sb.append(num);
-            }
-        }
-        return sb.toString();
+        Day9.Computer.Output output = computer.compute(code);
+        System.out.println(output.toAscii());
     }
 
     static final long[] INPUT = new long[]{
