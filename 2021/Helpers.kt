@@ -26,7 +26,9 @@ inline fun <reified T> Array<T>.permutations(crossinline onNextPermutation: (Arr
 }
 
 fun String.permutations(onNextPermutation: (String) -> Boolean) {
-    this.toList().permutations { onNextPermutation(it.joinToString(separator = "")) }
+    this.toList().permutations {
+        onNextPermutation(it.joinToString(separator = ""))
+    }
 }
 
 fun <T> List<List<T>>.forEachInGrid(action: (row: Int, col: Int, cell: T) -> Unit) {
@@ -40,3 +42,9 @@ fun <T> List<List<T>>.getCell(row: Int, col: Int, default: T): T {
     if (col >= list.size) return default
     return list[col]
 }
+
+val <T> Pair<T, T>.x get() = this.first
+val <T> Pair<T, T>.y get() = this.second
+val <T> Triple<T, T, T>.x get() = this.first
+val <T> Triple<T, T, T>.y get() = this.second
+val <T> Triple<T, T, T>.z get() = this.third
