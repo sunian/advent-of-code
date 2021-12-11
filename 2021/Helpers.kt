@@ -31,6 +31,8 @@ fun String.permutations(onNextPermutation: (String) -> Boolean) {
     }
 }
 
+fun <T> emptyGrid() = mutableListOf<MutableList<T>>()
+
 fun <T> List<List<T>>.forEachInGrid(action: (row: Int, col: Int, cell: T) -> Unit) {
     this.forEachIndexed { r, row -> row.forEachIndexed { c, cell -> action(r, c, cell) } }
 }
@@ -41,6 +43,21 @@ fun <T> List<List<T>>.getCell(row: Int, col: Int, default: T): T {
     val list = this[row]
     if (col >= list.size) return default
     return list[col]
+}
+
+val adjacentOffsets = arrayOf(
+    -1 to -1,
+    -1 to 0,
+    -1 to 1,
+    0 to -1,
+    0 to 1,
+    1 to -1,
+    1 to 0,
+    1 to 1,
+)
+
+fun <T> List<List<T>>.adjacentCells(row: Int, col: Int): List<Pair<Int, Int>> {
+    return adjacentOffsets.map { (r, c) -> row + r to col + c }
 }
 
 val <T> Pair<T, T>.x get() = this.first
