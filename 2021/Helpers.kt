@@ -65,3 +65,5 @@ val <T> Pair<T, T>.y get() = this.second
 val <T> Triple<T, T, T>.x get() = this.first
 val <T> Triple<T, T, T>.y get() = this.second
 val <T> Triple<T, T, T>.z get() = this.third
+
+fun <T> List<T>.countCopies(element: T) = this.count { it == element }
