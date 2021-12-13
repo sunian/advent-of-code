@@ -56,7 +56,7 @@ val adjacentOffsets = arrayOf(
     1 to 1,
 )
 
-fun <T> List<List<T>>.adjacentCells(row: Int, col: Int): List<Pair<Int, Int>> {
+fun adjacentCells(row: Int, col: Int): List<Pair<Int, Int>> {
     return adjacentOffsets.map { (r, c) -> row + r to col + c }
 }
 
@@ -66,4 +66,19 @@ val <T> Triple<T, T, T>.x get() = this.first
 val <T> Triple<T, T, T>.y get() = this.second
 val <T> Triple<T, T, T>.z get() = this.third
 
-fun <T> List<T>.countCopies(element: T) = this.count { it == element }
+fun <T> Collection<T>.countCopies(element: T) = this.count { it == element }
+
+fun Collection<Pair<Int, Int>>.toDotGrid(): String {
+    val rangeX = minOf { it.x }..maxOf { it.x }
+    val rangeY = minOf { it.y }..maxOf { it.y }
+    return rangeY.map { y -> rangeX.map { x -> this.contains(x to y) } }
+        .toDotGrid(solidValue = true)
+}
+
+fun <T> List<List<T>>.toDotGrid(solidValue: T): String =
+    gridToString { if (it == solidValue) "##" else ".`" }
+
+fun <T> List<List<T>>.gridToString(transform: (T) -> String): String =
+    this.joinToString(separator = "\n") { row ->
+        row.joinToString(separator = "", transform = transform)
+    }
