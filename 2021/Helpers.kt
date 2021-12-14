@@ -67,6 +67,7 @@ val <T> Triple<T, T, T>.y get() = this.second
 val <T> Triple<T, T, T>.z get() = this.third
 
 fun <T> Collection<T>.countCopies(element: T) = this.count { it == element }
+fun String.countCopies(element: Char) = this.count { it == element }
 
 fun Collection<Pair<Int, Int>>.toDotGrid(): String {
     val rangeX = minOf { it.x }..maxOf { it.x }
@@ -82,3 +83,23 @@ fun <T> List<List<T>>.gridToString(transform: (T) -> String): String =
     this.joinToString(separator = "\n") { row ->
         row.joinToString(separator = "", transform = transform)
     }
+
+fun <K> MutableMap<K, Long>.addNum(key: K, increment: Long) {
+    this[key] = (this[key] ?: 0) + increment
+}
+
+fun <K> MutableMap<K, Int>.addNum(key: K, increment: Int) {
+    this[key] = (this[key] ?: 0) + increment
+}
+
+fun <K> MutableMap<K, Double>.addNum(key: K, increment: Double) {
+    this[key] = (this[key] ?: 0.0) + increment
+}
+
+fun <K, V> MutableMap<K, List<V>>.addListElement(key: K, value: V) {
+    this[key] = (this[key] ?: emptyList()) + value
+}
+
+fun <K, V> MutableMap<K, Set<V>>.addSetElement(key: K, value: V) {
+    this[key] = (this[key] ?: emptySet()) + value
+}
