@@ -14,8 +14,8 @@ private val graph = hashMapOf<String, List<String>>()
 private fun parseInput() {
     File("input.txt").forEachLine { line ->
         val (start, end) = line.split("-")
-        graph[start] = (graph[start] ?: emptyList()) + end
-        graph[end] = (graph[end] ?: emptyList()) + start
+        graph.addListElement(start, end)
+        graph.addListElement(end, start)
     }
 }
 

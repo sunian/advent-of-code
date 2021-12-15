@@ -45,19 +45,26 @@ fun <T> List<List<T>>.getCell(row: Int, col: Int, default: T): T {
     return list[col]
 }
 
-val adjacentOffsets = arrayOf(
-    -1 to -1,
+private val adjacentOffsets = arrayOf(
     -1 to 0,
-    -1 to 1,
     0 to -1,
     0 to 1,
-    1 to -1,
     1 to 0,
+)
+private val adjacentAndDiagonalOffsets = arrayOf(
+    *adjacentOffsets,
+    -1 to -1,
+    -1 to 1,
+    1 to -1,
     1 to 1,
 )
 
 fun adjacentCells(row: Int, col: Int): List<Pair<Int, Int>> {
     return adjacentOffsets.map { (r, c) -> row + r to col + c }
+}
+
+fun adjacentAndDiagonalCells(row: Int, col: Int): List<Pair<Int, Int>> {
+    return adjacentAndDiagonalOffsets.map { (r, c) -> row + r to col + c }
 }
 
 val <T> Pair<T, T>.x get() = this.first
@@ -102,4 +109,59 @@ fun <K, V> MutableMap<K, List<V>>.addListElement(key: K, value: V) {
 
 fun <K, V> MutableMap<K, Set<V>>.addSetElement(key: K, value: V) {
     this[key] = (this[key] ?: emptySet()) + value
+}
+
+data class ShortestPath<Node>(val cost: Long, val prev: Node)
+
+/** Find the total length of the shortest path from [start] to [end] in a graph. */
+fun <Node> findShortestPathCost(
+    start: Node,
+    end: Node,
+    getAdjacentNodes: (Node) -> Collection<Node>,
+    getEdgeWeight: (from: Node, to: Node) -> Long
+): Long {
+    val shortestPaths = findShortestPaths(start, getAdjacentNodes, getEdgeWeight)
+    return shortestPaths[end]!!.cost
+}
+
+/** Find the list of nodes that forms the shortest path from [start] to [end] in a graph. */
+fun <Node> findShortestPath(
+    start: Node,
+    end: Node,
+    getAdjacentNodes: (Node) -> Collection<Node>,
+    getEdgeWeight: (from: Node, to: Node) -> Long
+): List<Node> {
+    val shortestPaths = findShortestPaths(start, getAdjacentNodes, getEdgeWeight)
+    val path = arrayListOf(end)
+    while (start !in path) {
+        path.add(shortestPaths[path.last()]!!.prev)
+    }
+    path.reverse()
+    return path
+}
+
+/** Find the shortest path to all nodes in a graph, starting from [start]. */
+fun <Node> findShortestPaths(
+    start: Node,
+    getAdjacentNodes: (Node) -> Collection<Node>,
+    getEdgeWeight: (from: Node, to: Node) -> Long
+): Map<Node, ShortestPath<Node>> {
+    var nodes = listOf(start)
+    val shortestPaths = hashMapOf(start to ShortestPath(0, start))
+    while (nodes.isNotEmpty()) {
+        nodes = nodes.map { src ->
+            getAdjacentNodes(src).flatMap { dst ->
+                val edge = getEdgeWeight(src, dst)
+                if (edge < Long.MAX_VALUE) {
+                    val newCost = shortestPaths[src]!!.cost + edge
+                    if (newCost < (shortestPaths[dst]?.cost ?: Long.MAX_VALUE)) {
+                        shortestPaths[dst] = ShortestPath(newCost, src)
+                        return@flatMap listOf(dst)
+                    }
+                }
+                return@flatMap emptyList<Node>()
+            }
+        }.flatten()
+    }
+    return shortestPaths
 }

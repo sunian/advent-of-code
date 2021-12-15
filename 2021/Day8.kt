@@ -80,11 +80,11 @@ private fun String.contains3(other: String): Boolean = other.count { this.contai
 1 cf
 7 acf
 4 bcdf
-2 acdeg only cd
 3 acdfg all cf
 5 abdfg has bdf
+2 acdeg only cd
+9 abcdfg all bcdf
 0 abcefg all cf
 6 abdefg no cf
-9 abcdfg all bcdf
 8 abcdefg
 */
