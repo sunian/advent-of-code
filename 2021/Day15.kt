@@ -5,8 +5,8 @@ import java.io.File
 /** Day 15: Chiton */
 fun main() {
     parseInput()
-    part1()
-    part2()
+    solve(sizeMultiplier = 1)
+    solve(sizeMultiplier = 5)
 }
 
 private val grid = arrayListOf<List<Long>>()
@@ -16,35 +16,25 @@ private fun parseInput() {
     }
 }
 
-private fun part2() {
-    val rows = grid.size
-    val cols = grid.first().size
-    val lastRow = rows * 5 - 1
-    val lastCol = cols * 5 - 1
+private fun solve(sizeMultiplier: Int) {
+    val rowCount = grid.size
+    val colCount = grid.first().size
+    val lastRow = rowCount * sizeMultiplier - 1
+    val lastCol = colCount * sizeMultiplier - 1
+    val allRows = 0..lastRow
+    val allCols = 0..lastCol
+
     println(findShortestPathCost(
         start = 0 to 0,
         end = lastRow to lastCol,
-        getAdjacentNodes = { (r, c) -> adjacentCells(r, c) },
+        getAdjacentNodes = { node ->
+            adjacentCells(node.row, node.col)
+                .filter { (r, c) -> r in allRows && c in allCols }
+        },
         getEdgeWeight = { _, (r, c) ->
-            if (r in 0..lastRow && c in 0..lastCol) {
-                var edge = grid.getCell(r % rows, c % cols, 0)
-                edge += r / rows + c / cols
-                if (edge > 9) {
-                    edge -= 9
-                }
-                edge
-            } else {
-                Long.MAX_VALUE
-            }
+            (grid[r % rowCount][c % colCount]
+                    + r / rowCount + c / colCount
+                    - 1) % 9 + 1
         }
-    ))
-}
-
-private fun part1() {
-    println(findShortestPathCost(
-        start = 0 to 0,
-        end = grid.size - 1 to grid.first().size - 1,
-        getAdjacentNodes = { (r, c) -> adjacentCells(r, c) },
-        getEdgeWeight = { _, (r, c) -> grid.getCell(r, c, Long.MAX_VALUE) }
     ))
 }

@@ -69,6 +69,8 @@ fun adjacentAndDiagonalCells(row: Int, col: Int): List<Pair<Int, Int>> {
 
 val <T> Pair<T, T>.x get() = this.first
 val <T> Pair<T, T>.y get() = this.second
+val <T> Pair<T, T>.row get() = this.first
+val <T> Pair<T, T>.col get() = this.second
 val <T> Triple<T, T, T>.x get() = this.first
 val <T> Triple<T, T, T>.y get() = this.second
 val <T> Triple<T, T, T>.z get() = this.third
@@ -149,19 +151,18 @@ fun <Node> findShortestPaths(
     var nodes = listOf(start)
     val shortestPaths = hashMapOf(start to ShortestPath(0, start))
     while (nodes.isNotEmpty()) {
-        nodes = nodes.map { src ->
+        nodes = nodes.flatMap { src ->
             getAdjacentNodes(src).flatMap { dst ->
                 val edge = getEdgeWeight(src, dst)
-                if (edge < Long.MAX_VALUE) {
-                    val newCost = shortestPaths[src]!!.cost + edge
-                    if (newCost < (shortestPaths[dst]?.cost ?: Long.MAX_VALUE)) {
-                        shortestPaths[dst] = ShortestPath(newCost, src)
-                        return@flatMap listOf(dst)
-                    }
+                val newCost = shortestPaths[src]!!.cost + edge
+                if (newCost < (shortestPaths[dst]?.cost ?: Long.MAX_VALUE)) {
+                    shortestPaths[dst] = ShortestPath(newCost, src)
+                    listOf(dst)
+                } else {
+                    emptyList()
                 }
-                return@flatMap emptyList<Node>()
             }
-        }.flatten()
+        }
     }
     return shortestPaths
 }
