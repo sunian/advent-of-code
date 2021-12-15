@@ -8,7 +8,7 @@ fun main() {
     part2()
 }
 
-var initialAges = arrayListOf<Int>()
+private var initialAges = arrayListOf<Int>()
 private fun parseInput() {
     val ages = File("input.txt").readLines()[0].split(",").map { it.toInt() }
     initialAges.addAll(ages)
