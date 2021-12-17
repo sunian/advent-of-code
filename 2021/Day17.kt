@@ -1,6 +1,5 @@
 package advent2021
 
-import kotlin.math.max
 import kotlin.math.sign
 
 /** Day 17: Trick Shot */
@@ -11,46 +10,47 @@ fun main() {
 
 private val xRange = 32..65
 private val yRange = -225..-177
+private const val MILLION = 1_000_000
 
-private fun isInTarget(x: Int, y: Int) = x in xRange && y in yRange
+private fun Pair<Int, Int>.isInTarget() = x in xRange && y in yRange
 
 private fun part1() {
-    println((0..100000).maxOf { maxHeightFor(it) })
+    println((0..MILLION).maxOf { maxHeightFor(it) })
 }
 
 private fun part2() {
-    val allValidDy = (-2000..2000).filter { maxHeightFor(it) >= 0 }
-    println((0..100000).sumOf { dx ->
+    val allValidDy = (-MILLION..MILLION).filter { maxHeightFor(it) >= 0 }
+    println((0..MILLION).sumOf { dx ->
         allValidDy.count { dy -> willHitTarget(dx, dy) }
     })
 }
 
 private fun maxHeightFor(initialDy: Int): Int {
-    var maxY = 0
     var y = 0
-    var dy = initialDy
+    var dy = when {
+        initialDy > 0 -> -initialDy - 1
+        else -> initialDy
+    }
     while (y >= yRange.first) {
         y += dy
         dy--
-        maxY = max(y, maxY)
         if (y in yRange) {
-            return maxY
+            return when {
+                initialDy > 0 -> (initialDy * initialDy + initialDy) / 2
+                else -> 0
+            }
         }
     }
     return -1
 }
 
 private fun willHitTarget(initialDx: Int, initialDy: Int): Boolean {
-    var x = 0
-    var y = 0
-    var dx = initialDx
-    var dy = initialDy
-    while (y >= yRange.first && x <= xRange.last) {
-        x += dx
-        y += dy
-        dy--
-        dx -= dx.sign
-        if (isInTarget(x, y)) {
+    var position = 0 to 0
+    var velocity = initialDx to initialDy
+    while (position.y >= yRange.first && position.x <= xRange.last) {
+        position += velocity
+        velocity -= velocity.x.sign to 1
+        if (position.isInTarget()) {
             return true
         }
     }

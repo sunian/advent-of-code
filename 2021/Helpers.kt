@@ -60,11 +60,13 @@ private val adjacentAndDiagonalOffsets = arrayOf(
 )
 
 fun adjacentCells(row: Int, col: Int): List<Pair<Int, Int>> {
-    return adjacentOffsets.map { (r, c) -> row + r to col + c }
+    val source = row to col
+    return adjacentOffsets.map { source + it }
 }
 
 fun adjacentAndDiagonalCells(row: Int, col: Int): List<Pair<Int, Int>> {
-    return adjacentAndDiagonalOffsets.map { (r, c) -> row + r to col + c }
+    val source = row to col
+    return adjacentAndDiagonalOffsets.map { source + it }
 }
 
 val <T> Pair<T, T>.x get() = this.first
@@ -74,6 +76,11 @@ val <T> Pair<T, T>.col get() = this.second
 val <T> Triple<T, T, T>.x get() = this.first
 val <T> Triple<T, T, T>.y get() = this.second
 val <T> Triple<T, T, T>.z get() = this.third
+operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> =
+    this.copy(first + other.first, second + other.second)
+
+operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> =
+    this.copy(first - other.first, second - other.second)
 
 fun <T> Collection<T>.countCopies(element: T) = this.count { it == element }
 fun String.countCopies(element: Char) = this.count { it == element }
