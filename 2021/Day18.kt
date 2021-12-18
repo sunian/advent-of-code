@@ -31,8 +31,8 @@ private fun part1() {
     println(snailSum.magnitude())
 }
 
-private sealed class Snail {
-    abstract var replaceSelf: (Snail) -> Unit
+private sealed class Element {
+    lateinit var replaceSelf: (Element) -> Unit
     abstract fun isPair(): Boolean
     abstract fun magnitude(): Long
 
@@ -52,7 +52,7 @@ private sealed class Snail {
             null
         }
 
-    fun replaceMyself(newSelf: Snail) {
+    fun replaceMyself(newSelf: Element) {
         replaceSelf(newSelf)
         newSelf.replaceSelf = this.replaceSelf
     }
@@ -60,7 +60,7 @@ private sealed class Snail {
     fun collectLiterals(): List<Literal> =
         arrayListOf<Literal>().also { it.parse(this) }
 
-    fun reduce(): Snail {
+    fun reduce(): Element {
         while (reduceStep()) {
         }
         return this
@@ -93,23 +93,21 @@ private sealed class Snail {
         return false
     }
 
-    operator fun plus(snail: Snail): Snail =
-        Snailfish(this, snail)
+    operator fun plus(element: Element): Element =
+        Snailfish(this, element)
             .apply { replaceSelf = {} }
             .reduce()
 }
 
 private class Snailfish(
-    var left: Snail,
-    var right: Snail,
-) : Snail() {
+    var left: Element,
+    var right: Element,
+) : Element() {
 
     init {
         left.replaceSelf = { this.left = it }
         right.replaceSelf = { this.right = it }
     }
-
-    override lateinit var replaceSelf: (Snail) -> Unit
 
     override fun isPair(): Boolean = left is Literal && right is Literal
     override fun magnitude(): Long = left.magnitude() * 3 + right.magnitude() * 2
@@ -117,9 +115,7 @@ private class Snailfish(
 
 private class Literal(
     var n: Int
-) : Snail() {
-    override lateinit var replaceSelf: (Snail) -> Unit
-
+) : Element() {
     override fun isPair(): Boolean = false
     override fun magnitude(): Long = n.toLong()
 }
@@ -128,7 +124,7 @@ private fun String.readSnailfish() = this.toMutableList()
     .readSnailfish()
     .apply { replaceSelf = {} }
 
-private fun MutableList<Char>.readSnailfish(): Snail =
+private fun MutableList<Char>.readSnailfish(): Element =
     if (this[0] == '[') {
         this.removeFirst()
         Snailfish(
@@ -139,12 +135,12 @@ private fun MutableList<Char>.readSnailfish(): Snail =
         Literal(this.removeFirst().toString().toInt())
     }
 
-private fun MutableList<Literal>.parse(snail: Snail) {
-    when (snail) {
-        is Literal -> this.add(snail)
+private fun MutableList<Literal>.parse(element: Element) {
+    when (element) {
+        is Literal -> this.add(element)
         is Snailfish -> {
-            this.parse(snail.left)
-            this.parse(snail.right)
+            this.parse(element.left)
+            this.parse(element.right)
         }
     }
 }
