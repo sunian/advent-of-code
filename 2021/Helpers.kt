@@ -1,5 +1,10 @@
 package advent2021
 
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.roundToInt
+import kotlin.math.sin
+
 fun <T> List<T>.permutations(onNextPermutation: (List<T>) -> Boolean) {
     if (this.size < 2) {
         onNextPermutation(this)
@@ -69,6 +74,24 @@ fun adjacentAndDiagonalCells(row: Int, col: Int): List<Pair<Int, Int>> {
     return adjacentAndDiagonalOffsets.map { source + it }
 }
 
+typealias Vector3Int = Triple<Int, Int, Int>
+typealias Matrix3Int = Array<IntArray>
+
+val Identity: Matrix3Int = arrayOf(
+    intArrayOf(1, 0, 0),
+    intArrayOf(0, 1, 0),
+    intArrayOf(0, 0, 1),
+)
+
+inline fun <R> Triple<R, R, R>.mapIndexed(transform: (index: Int, R) -> R): Triple<R, R, R> =
+    Triple(
+        transform(0, first),
+        transform(1, second),
+        transform(2, third),
+    )
+
+fun Vector3Int.sum(): Int = first + second + third
+
 val <T> Pair<T, T>.x get() = this.first
 val <T> Pair<T, T>.y get() = this.second
 val <T> Pair<T, T>.row get() = this.first
@@ -81,6 +104,75 @@ operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> =
 
 operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> =
     this.copy(first - other.first, second - other.second)
+
+operator fun Vector3Int.plus(other: Vector3Int): Vector3Int =
+    this.copy(first + other.first, second + other.second, third + other.third)
+
+operator fun Vector3Int.minus(other: Vector3Int): Vector3Int =
+    this.copy(first - other.first, second - other.second, third - other.third)
+
+fun matrixRotateX(radians: Double): Matrix3Int = arrayOf(
+    intArrayOf(1, 0, 0),
+    intArrayOf(0, cos(radians).roundToInt(), -sin(radians).roundToInt()),
+    intArrayOf(0, sin(radians).roundToInt(), cos(radians).roundToInt())
+)
+
+fun matrixRotateY(radians: Double): Matrix3Int = arrayOf(
+    intArrayOf(cos(radians).roundToInt(), 0, sin(radians).roundToInt()),
+    intArrayOf(0, 1, 0),
+    intArrayOf(-sin(radians).roundToInt(), 0, cos(radians).roundToInt())
+)
+
+fun matrixRotateZ(radians: Double): Matrix3Int = arrayOf(
+    intArrayOf(cos(radians).roundToInt(), -sin(radians).roundToInt(), 0),
+    intArrayOf(sin(radians).roundToInt(), cos(radians).roundToInt(), 0),
+    intArrayOf(0, 0, 1)
+)
+
+operator fun Matrix3Int.times(other: Matrix3Int): Matrix3Int =
+    this.map { row ->
+        row.mapIndexed { c, _ ->
+            row.mapIndexed { i, n -> n * other[i][c] }.sum()
+        }.toIntArray()
+    }.toTypedArray()
+
+operator fun Matrix3Int.times(other: Vector3Int): Vector3Int =
+    other.mapIndexed { r, _ ->
+        other.mapIndexed { c, n -> n * this[r][c] }.sum()
+    }
+
+fun Matrix3Int.matrixString(): String = joinToString("\n") { it.joinToString("\t") }
+
+val Rotations3D: List<Matrix3Int> = arrayOf(
+    intArrayOf(0, 0, 0),
+    intArrayOf(0, 0, 1),
+    intArrayOf(0, 0, 2),
+    intArrayOf(0, 0, 3),
+    intArrayOf(0, 1, 0),
+    intArrayOf(0, 1, 1),
+    intArrayOf(0, 1, 2),
+    intArrayOf(0, 1, 3),
+    intArrayOf(0, 2, 0),
+    intArrayOf(0, 2, 1),
+    intArrayOf(0, 2, 2),
+    intArrayOf(0, 2, 3),
+    intArrayOf(0, 3, 0),
+    intArrayOf(0, 3, 1),
+    intArrayOf(0, 3, 2),
+    intArrayOf(0, 3, 3),
+    intArrayOf(1, 0, 0),
+    intArrayOf(1, 0, 1),
+    intArrayOf(1, 0, 2),
+    intArrayOf(1, 0, 3),
+    intArrayOf(1, 2, 0),
+    intArrayOf(1, 2, 1),
+    intArrayOf(1, 2, 2),
+    intArrayOf(1, 2, 3),
+).map { (x, y, z) ->
+    matrixRotateX(x * PI / 2) *
+            matrixRotateY(y * PI / 2) *
+            matrixRotateZ(z * PI / 2)
+}
 
 fun <T> Collection<T>.countCopies(element: T) = this.count { it == element }
 fun String.countCopies(element: Char) = this.count { it == element }
@@ -172,4 +264,10 @@ fun <Node> findShortestPaths(
         }
     }
     return shortestPaths
+}
+
+fun <T> List<T>.histogram(): Map<T, Int> {
+    val histogram = hashMapOf<T, Int>()
+    this.forEach { histogram.addNum(it, 1) }
+    return histogram
 }
