@@ -74,6 +74,12 @@ fun adjacentAndDiagonalCells(row: Int, col: Int): List<Pair<Int, Int>> {
     return adjacentAndDiagonalOffsets.map { source + it }
 }
 
+fun adjacent9Cells(row: Int, col: Int): List<Pair<Int, Int>> {
+    val source = row to col
+    return (-1..1).flatMap { r -> (-1..1).map { c -> r to c } }
+        .map { source + it }
+}
+
 typealias Vector3Int = Triple<Int, Int, Int>
 typealias Matrix3Int = Array<IntArray>
 
