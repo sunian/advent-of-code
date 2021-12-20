@@ -28,7 +28,7 @@ private fun solve(sizeMultiplier: Int) {
         start = 0 to 0,
         end = lastRow to lastCol,
         getAdjacentNodes = { node ->
-            adjacentCells(node.row, node.col)
+            adjacent4Cells(node.row, node.col)
                 .filter { (r, c) -> r in allRows && c in allCols }
         },
         getEdgeWeight = { _, (r, c) ->

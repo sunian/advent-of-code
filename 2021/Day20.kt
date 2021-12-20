@@ -41,9 +41,9 @@ private fun applyAlgoTwice(times: Int) {
 }
 
 private fun List<List<Int>>.applyAlgo(default: Int): List<List<Int>> =
-    (0..this.lastIndex + 2).map { r ->
-        (0..this.first().lastIndex + 2).map { c ->
-            val bitString = adjacent9Cells(r - 1, c - 1)
+    (-1..this.lastIndex + 1).map { r ->
+        (-1..this.first().lastIndex + 1).map { c ->
+            val bitString = adjacent9Cells(r, c)
                 .joinToString("") { (r, c) ->
                     this.getCell(r, c, default).toString()
                 }

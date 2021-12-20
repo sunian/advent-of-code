@@ -53,7 +53,7 @@ private fun increaseEnergy(row: Int, col: Int): Int {
     grid[row][col]++
     if (grid[row][col] != 10) return 0
 
-    return 1 + adjacentAndDiagonalCells(row, col)
+    return 1 + adjacent8Cells(row, col)
         .filter { (r, c) -> grid.getCell(r, c, -1) >= 0 }
         .sumOf { (r, c) -> increaseEnergy(r, c) }
 }

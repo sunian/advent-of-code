@@ -64,12 +64,12 @@ private val adjacentAndDiagonalOffsets = arrayOf(
     1 to 1,
 )
 
-fun adjacentCells(row: Int, col: Int): List<Pair<Int, Int>> {
+fun adjacent4Cells(row: Int, col: Int): List<Pair<Int, Int>> {
     val source = row to col
     return adjacentOffsets.map { source + it }
 }
 
-fun adjacentAndDiagonalCells(row: Int, col: Int): List<Pair<Int, Int>> {
+fun adjacent8Cells(row: Int, col: Int): List<Pair<Int, Int>> {
     val source = row to col
     return adjacentAndDiagonalOffsets.map { source + it }
 }
