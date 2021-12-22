@@ -16,7 +16,7 @@ private fun part2() {
                     else -> emptyList()
                 }
     }
-    println(cuboids.sumOf { it.size() })
+    println(cuboids.sumOf { it.volume() })
 }
 
 private data class Cuboid(
@@ -83,7 +83,7 @@ private data class Cuboid(
         else -> null
     }
 
-    fun size() = x.size().toBigInteger() * y.size().toBigInteger() * z.size().toBigInteger()
+    fun volume() = x.size().toLong() * y.size().toLong() * z.size().toLong()
 }
 
 private fun part1() {
