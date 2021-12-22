@@ -30,27 +30,35 @@ private data class Cuboid(
     private fun contains(other: Cuboid): Boolean =
         this.x.contains(other.x) && this.y.contains(other.y) && this.z.contains(other.z)
 
+    /** Start with [this] cuboid and remove its intersection with [other] cuboid.
+     * The remaining solid can be represented as a list of smaller cuboids. */
     fun remove(other: Cuboid): List<Cuboid> {
         if (!intersects(other)) {
+            // [this] and [other] don't touch, so the entirety of [this] cuboid is preserved
             return listOf(this)
         }
         if (other.contains(this)) {
+            // [this] cuboid is entirely inside [other], so nothing remains
             return emptyList()
         }
-        val xRanges = splitRanges(this.x, other.x)
-        val yRanges = splitRanges(this.y, other.y)
-        val zRanges = splitRanges(this.z, other.z)
-        val result = xRanges.flatMap { xRange ->
-            yRanges.flatMap { yRange ->
-                zRanges.map { zRange -> Cuboid(xRange, yRange, zRange) }
-            }
-        }.filter {
-            it.intersects(this) && !it.intersects(other)
-        }.toMutableList()
+        val xRanges = splitUnion(this.x, other.x)
+        val yRanges = splitUnion(this.y, other.y)
+        val zRanges = splitUnion(this.z, other.z)
+        // take the union of [this] and [other] and split it into small slices
+        val result = (xRanges * yRanges * zRanges)
+            .map { Cuboid(it.x, it.y, it.z) }
+            .filter {
+                // only keep the slices that are inside [this] but not inside [other]
+                it.intersects(this) && !it.intersects(other)
+            }.toMutableList()
+        // repeatedly merge slices together whenever possible until we find
+        // the minimal number of slices needed to represent the remaining solid
         while (true) {
             (result * result).firstOrNull { (cuboid1, cuboid2) ->
+                // find a pair of different slices that can be merged into a single cuboid
                 cuboid1 != cuboid2 && cuboid1.merge(cuboid2) != null
             }?.let { (cuboid1, cuboid2) ->
+                // replace the 2 slices with their merge
                 result.remove(cuboid1)
                 result.remove(cuboid2)
                 result.add(cuboid1.merge(cuboid2)!!)
@@ -59,7 +67,8 @@ private data class Cuboid(
         return result
     }
 
-    private fun splitRanges(myRange: IntRange, otherRange: IntRange): List<IntRange> {
+    /** split the union of 2 ranges into a list of contiguous subranges */
+    private fun splitUnion(myRange: IntRange, otherRange: IntRange): List<IntRange> {
         val list = arrayListOf<IntRange>()
         val points = setOf(myRange.first, myRange.last, otherRange.first, otherRange.last)
         list.addAll(points.sorted().windowed(2).map { IntRange(it.first() + 1, it.last() - 1) })

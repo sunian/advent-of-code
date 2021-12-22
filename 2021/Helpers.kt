@@ -286,10 +286,10 @@ operator fun <T, U> Collection<T>.times(other: Collection<U>): Sequence<Pair<T, 
     }
 }
 
-operator fun <T, U> Sequence<T>.times(other: Collection<U>): Sequence<Pair<T, U>> = sequence {
-    this@times.forEach { t ->
-        other.forEach { u ->
-            yield(t to u)
+operator fun <T, U, V> Sequence<Pair<T, U>>.times(other: Collection<V>): Sequence<Triple<T, U, V>> = sequence {
+    this@times.forEach { (t, u) ->
+        other.forEach { v ->
+            yield(Triple(t, u, v))
         }
     }
 }
