@@ -278,7 +278,25 @@ fun <T> List<T>.histogram(): Map<T, Int> {
     return histogram
 }
 
+operator fun <T, U> Collection<T>.times(other: Collection<U>): Sequence<Pair<T, U>> = sequence {
+    this@times.forEach { t ->
+        other.forEach { u ->
+            yield(t to u)
+        }
+    }
+}
+
+operator fun <T, U> Sequence<T>.times(other: Collection<U>): Sequence<Pair<T, U>> = sequence {
+    this@times.forEach { t ->
+        other.forEach { u ->
+            yield(t to u)
+        }
+    }
+}
+
 fun IntRange.intersects(other: IntRange): Boolean = last >= other.first && other.last >= first
+fun IntRange.isAdjacent(other: IntRange): Boolean = last == other.first - 1 || other.last == first - 1
 fun IntRange.intersection(other: IntRange) = first.coerceAtLeast(other.first)..last.coerceAtMost(other.last)
 fun IntRange.contains(other: IntRange) = first <= other.first && last >= other.last
 fun IntRange.size(): Int = last + 1 - first
+operator fun IntRange.plus(other: IntRange) = first.coerceAtMost(other.first)..last.coerceAtLeast(other.last)

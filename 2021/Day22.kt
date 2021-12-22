@@ -40,13 +40,23 @@ private data class Cuboid(
         val xRanges = splitRanges(this.x, other.x)
         val yRanges = splitRanges(this.y, other.y)
         val zRanges = splitRanges(this.z, other.z)
-        return xRanges.flatMap { xRange ->
+        val result = xRanges.flatMap { xRange ->
             yRanges.flatMap { yRange ->
                 zRanges.map { zRange -> Cuboid(xRange, yRange, zRange) }
             }
         }.filter {
             it.intersects(this) && !it.intersects(other)
+        }.toMutableList()
+        while (true) {
+            (result * result).firstOrNull { (cuboid1, cuboid2) ->
+                cuboid1 != cuboid2 && cuboid1.merge(cuboid2) != null
+            }?.let { (cuboid1, cuboid2) ->
+                result.remove(cuboid1)
+                result.remove(cuboid2)
+                result.add(cuboid1.merge(cuboid2)!!)
+            } ?: break
         }
+        return result
     }
 
     private fun splitRanges(myRange: IntRange, otherRange: IntRange): List<IntRange> {
@@ -55,6 +65,13 @@ private data class Cuboid(
         list.addAll(points.sorted().windowed(2).map { IntRange(it.first() + 1, it.last() - 1) })
         list.addAll(points.map { it..it })
         return list.filterNot { it.isEmpty() }
+    }
+
+    private fun merge(other: Cuboid): Cuboid? = when {
+        x == other.x && y == other.y && z.isAdjacent(other.z) -> Cuboid(x, y, z + other.z)
+        x == other.x && z == other.z && y.isAdjacent(other.y) -> Cuboid(x, y + other.y, z)
+        y == other.y && z == other.z && x.isAdjacent(other.x) -> Cuboid(x + other.x, y, z)
+        else -> null
     }
 
     fun size() = x.size().toBigInteger() * y.size().toBigInteger() * z.size().toBigInteger()
