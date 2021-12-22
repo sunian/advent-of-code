@@ -277,3 +277,8 @@ fun <T> List<T>.histogram(): Map<T, Int> {
     this.forEach { histogram.addNum(it, 1) }
     return histogram
 }
+
+fun IntRange.intersects(other: IntRange): Boolean = last >= other.first && other.last >= first
+fun IntRange.intersection(other: IntRange) = first.coerceAtLeast(other.first)..last.coerceAtMost(other.last)
+fun IntRange.contains(other: IntRange) = first <= other.first && last >= other.last
+fun IntRange.size(): Int = last + 1 - first
