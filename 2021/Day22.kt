@@ -24,7 +24,7 @@ private data class Cuboid(
     val y: IntRange,
     val z: IntRange
 ) {
-    private fun intersects(other: Cuboid): Boolean =
+    fun intersects(other: Cuboid): Boolean =
         this.x.intersects(other.x) && this.y.intersects(other.y) && this.z.intersects(other.z)
 
     private fun contains(other: Cuboid): Boolean =
