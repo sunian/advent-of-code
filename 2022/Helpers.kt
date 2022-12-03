@@ -3,8 +3,92 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
+/*
+Iterable.toPair, toTriple : Convert an Iterable to a Pair or a Triple
+Iterable.bucketize : Convert an Iterable of elements into a List of buckets of said elements, using a given heuristic
+permutations : Calculate all the permutations of a List, Array, or String
+Iterable.countCopies, String.countCopies: count how many times a given element appears
+Iterable.histogram : count how many times every element appears in an Iterable.
+Iterable.times: Compute the cross product of 2 or 3 Iterables as a Sequence
+
+IntRange.intersects
+IntRange.isAdjacent
+IntRange.intersection
+IntRange.contains
+IntRange.size
+IntRange.plus
+
+Grid operations (a grid is a List of Lists) :
+emptyGrid : create an empty mutable grid
+forEachInGrid : perform an action for each cell in a grid
+getCell : return the item in a cell, or a default value if the input position is out of bounds
+adjacentOffsets : offsets for 4 cells adjacent to a cell (up, down, left, right)
+adjacentAndDiagonalOffsets : offsets for 8 cells adjacent to a cell (includes diagonals)
+adjacent4Cells : returns the 4 cells adjacent to the cell (using adjacentOffsets)
+adjacent8Cells : returns the 8 cells adjacent to the cell (using adjacentAndDiagonalOffsets)
+adjacent9Cells : returns the 9 cells adjacent to the cell (including the input cell itself)
+toDotGrid : pretty print a grid of solid/empty cells
+gridToString : pretty print a grid given a mapping
+Pair.row, Pair.col : treat a Pair as a grid position
+
+Operations for 3D vectors and matrices:
+typealias Vector3Int and Matrix3Int
+Identity : the identity matrix
+mapIndexed : transform a Triple as if it were a list
+Vector3Int.sum : sum 3 components of a vector
+Pair.x, Pair.y : treat a Pair as an (x, y) coordinate
+Triple.x, Triple.y, Triple.z : treat a Triple as an (x, y, z) coordinate
+Pair.plus, Pair.minus : arithmetic on 2 Pairs of Ints
+Vector3Int.plus, Vector3Int.minus : arithmetic on 2 vectors
+matrixRotateX, matrixRotateY, matrixRotateZ : returns a rotation matrix of a given angle in radians
+Matrix3Int.times : multiply a matrix by another matrix or a vector
+matrixString : pretty print a matrix
+Rotations3D : all rotation matrices of 90 degree increments
+
+findShortestPath
+findShortestPathCost
+findShortestPaths
+*/
+
 fun <T> Iterable<T>.toPair(): Pair<T, T> = iterator().let { it.next() to it.next() }
 fun <T> Iterable<T>.toTriple(): Triple<T, T, T> = iterator().let { Triple(it.next(), it.next(), it.next()) }
+
+fun <T> Iterable<T>.bucketize(
+    callback: (
+        currentBucket: List<T>,
+        newElement: T,
+        addToCurrentBucket: (T) -> Unit,
+        startNewBucket: () -> Unit
+    ) -> Unit
+): List<List<T>> {
+    var currentBucket = arrayListOf<T>()
+    val buckets = arrayListOf<List<T>>(currentBucket)
+    val addToCurrentBucket: (T) -> Unit = { currentBucket.add(it) }
+    val startNewBucket: () -> Unit = {
+        currentBucket = arrayListOf()
+        buckets.add(currentBucket)
+    }
+    this.forEach { callback(currentBucket, it, addToCurrentBucket, startNewBucket) }
+    return buckets
+}
+
+fun <T> Iterable<T>.bucketize(bucketSize: Int): List<List<T>> =
+    this.bucketize { currentBucket, newElement, addToCurrentBucket, startNewBucket ->
+        if (currentBucket.size >= bucketSize) {
+            startNewBucket()
+        }
+        addToCurrentBucket(newElement)
+    }
+
+fun <T> Iterable<T>.bucketize(delimiter: T, allowEmptyBuckets: Boolean): List<List<T>> =
+    this.bucketize { currentBucket, newElement, addToCurrentBucket, startNewBucket ->
+        when (newElement) {
+            delimiter -> if (allowEmptyBuckets || currentBucket.isNotEmpty()) {
+                startNewBucket()
+            }
+            else -> addToCurrentBucket(newElement)
+        }
+    }
 
 fun <T> List<T>.permutations(onNextPermutation: (List<T>) -> Boolean) {
     if (this.size < 2) {
@@ -181,7 +265,7 @@ val Rotations3D: List<Matrix3Int> = arrayOf(
             matrixRotateZ(z * PI / 2)
 }
 
-fun <T> Collection<T>.countCopies(element: T) = this.count { it == element }
+fun <T> Iterable<T>.countCopies(element: T) = this.count { it == element }
 fun String.countCopies(element: Char) = this.count { it == element }
 
 fun Collection<Pair<Int, Int>>.toDotGrid(): String {
@@ -273,13 +357,13 @@ fun <Node> findShortestPaths(
     return shortestPaths
 }
 
-fun <T> List<T>.histogram(): Map<T, Int> {
+fun <T> Iterable<T>.histogram(): Map<T, Int> {
     val histogram = hashMapOf<T, Int>()
     this.forEach { histogram.addNum(it, 1) }
     return histogram
 }
 
-operator fun <T, U> Collection<T>.times(other: Collection<U>): Sequence<Pair<T, U>> = sequence {
+operator fun <T, U> Iterable<T>.times(other: Iterable<U>): Sequence<Pair<T, U>> = sequence {
     this@times.forEach { t ->
         other.forEach { u ->
             yield(t to u)
@@ -287,7 +371,7 @@ operator fun <T, U> Collection<T>.times(other: Collection<U>): Sequence<Pair<T, 
     }
 }
 
-operator fun <T, U, V> Sequence<Pair<T, U>>.times(other: Collection<V>): Sequence<Triple<T, U, V>> = sequence {
+operator fun <T, U, V> Sequence<Pair<T, U>>.times(other: Iterable<V>): Sequence<Triple<T, U, V>> = sequence {
     this@times.forEach { (t, u) ->
         other.forEach { v ->
             yield(Triple(t, u, v))

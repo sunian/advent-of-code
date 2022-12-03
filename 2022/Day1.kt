@@ -1,5 +1,6 @@
 package advent2022
 
+import bucketize
 import java.io.File
 
 /** Day 1: Calorie Counting */
@@ -9,19 +10,12 @@ fun main() {
     part2()
 }
 
-val elves = arrayListOf<List<Long>>()
+private lateinit var elves: List<List<Long>>
 
 private fun parseInput() {
-    var elf = arrayListOf<Long>()
-    elves.add(elf)
-    File("input.txt").forEachLine { line ->
-        if (line.isEmpty()) {
-            elf = arrayListOf()
-            elves.add(elf)
-        } else {
-            elf.add(line.toLong())
-        }
-    }
+    elves = File("input.txt").readLines()
+        .bucketize(delimiter = "", allowEmptyBuckets = false)
+        .map { it.map(String::toLong) }
 }
 
 private fun part1() {
