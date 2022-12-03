@@ -11,7 +11,6 @@ fun main() {
 }
 
 private lateinit var rucksacks: List<String>
-private const val items = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 private fun parseInput() {
     rucksacks = File("input.txt").readLines()
@@ -36,7 +35,7 @@ private fun part2() {
 }
 
 private fun getBadge(rucksacks: List<String>): Char =
-    items.first { item ->
+    rucksacks[0].first { item ->
         rucksacks.all { rucksack -> rucksack.contains(item) }
     }
 
