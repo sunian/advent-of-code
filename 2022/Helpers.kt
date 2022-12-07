@@ -54,6 +54,7 @@ fun <T> Iterable<T>.toPair(): Pair<T, T> = iterator().let { it.next() to it.next
 fun <T> Iterable<T>.toTriple(): Triple<T, T, T> = iterator().let { Triple(it.next(), it.next(), it.next()) }
 
 fun <T> Iterable<T>.bucketize(
+    allowEmptyBuckets: Boolean = false,
     callback: (
         currentBucket: List<T>,
         newElement: T,
@@ -65,8 +66,10 @@ fun <T> Iterable<T>.bucketize(
     val buckets = arrayListOf<List<T>>(currentBucket)
     val addToCurrentBucket: (T) -> Unit = { currentBucket.add(it) }
     val startNewBucket: () -> Unit = {
-        currentBucket = arrayListOf()
-        buckets.add(currentBucket)
+        if (allowEmptyBuckets || currentBucket.isNotEmpty()) {
+            currentBucket = arrayListOf()
+            buckets.add(currentBucket)
+        }
     }
     this.forEach { callback(currentBucket, it, addToCurrentBucket, startNewBucket) }
     return buckets
@@ -81,11 +84,9 @@ fun <T> Iterable<T>.bucketize(bucketSize: Int): List<List<T>> =
     }
 
 fun <T> Iterable<T>.bucketize(delimiter: T, allowEmptyBuckets: Boolean): List<List<T>> =
-    this.bucketize { currentBucket, newElement, addToCurrentBucket, startNewBucket ->
+    this.bucketize(allowEmptyBuckets) { _, newElement, addToCurrentBucket, startNewBucket ->
         when (newElement) {
-            delimiter -> if (allowEmptyBuckets || currentBucket.isNotEmpty()) {
-                startNewBucket()
-            }
+            delimiter -> startNewBucket()
             else -> addToCurrentBucket(newElement)
         }
     }

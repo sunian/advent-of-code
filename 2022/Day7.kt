@@ -49,8 +49,8 @@ private fun dfs(dir: Dir, callback: (Dir) -> Unit) {
 }
 
 private fun handleLines(lines: List<String>) {
-    lines.bucketize { currentBucket, newElement, addToCurrentBucket, startNewBucket ->
-        if (newElement.startsWith("$ ") && currentBucket.isNotEmpty()) {
+    lines.bucketize { _, newElement, addToCurrentBucket, startNewBucket ->
+        if (newElement.startsWith("$ ")) {
             startNewBucket()
             addToCurrentBucket(newElement.replaceFirst("$ ", ""))
         } else {
