@@ -136,13 +136,13 @@ fun <T> List<List<T>>.getCell(row: Int, col: Int, default: T): T {
     return list[col]
 }
 
-private val adjacentOffsets = arrayOf(
+val adjacentOffsets = arrayOf(
     -1 to 0,
     0 to -1,
     0 to 1,
     1 to 0,
 )
-private val adjacentAndDiagonalOffsets = arrayOf(
+val adjacentAndDiagonalOffsets = arrayOf(
     *adjacentOffsets,
     -1 to -1,
     -1 to 1,
