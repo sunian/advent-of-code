@@ -136,6 +136,9 @@ fun <T> List<List<T>>.getCell(row: Int, col: Int, default: T): T {
     return list[col]
 }
 
+fun <T> List<List<T>>.getCell(pos: Pair<Int, Int>): T = this[pos.row][pos.col]
+fun <T> List<List<List<T>>>.getCell(pos: Vector3Int): T = this[pos.x][pos.y][pos.z]
+
 val adjacentOffsets = arrayOf(
     -1 to 0,
     0 to -1,
