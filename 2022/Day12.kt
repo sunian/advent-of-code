@@ -30,6 +30,7 @@ private fun parseInput() {
 }
 
 private fun part1() {
+
     // find the shortest path from S to E
     // 2 nodes are considered adjacent if the dest is at most 1 unit higher than the src
     // all edges between adjacent nodes have weight 1

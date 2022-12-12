@@ -1,7 +1,4 @@
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
+import kotlin.math.*
 
 /*
 Iterable.toPair, toTriple : Convert an Iterable to a Pair or a Triple
@@ -48,6 +45,9 @@ Rotations3D : all rotation matrices of 90 degree increments
 findShortestPath
 findShortestPathCost
 findShortestPaths
+
+greatestCommonFactor
+leastCommonMultiple
 */
 
 fun <T> Iterable<T>.toPair(): Pair<T, T> = iterator().let { it.next() to it.next() }
@@ -389,3 +389,19 @@ fun IntRange.intersection(other: IntRange) = first.coerceAtLeast(other.first)..l
 fun IntRange.contains(other: IntRange) = first <= other.first && last >= other.last
 fun IntRange.size(): Int = last + 1 - first
 operator fun IntRange.plus(other: IntRange) = first.coerceAtMost(other.first)..last.coerceAtLeast(other.last)
+
+fun greatestCommonFactor(a: Long, b: Long): Long {
+    val n = abs(a)
+    val m = abs(b)
+    var x = max(n, m)
+    var y = min(n, m)
+    var r = x.mod(y)
+    while (r != 0L) {
+        x = y
+        y = r
+        r = x.mod(y)
+    }
+    return y
+}
+
+fun leastCommonMultiple(a: Long, b: Long) = abs(a) * (abs(b) / greatestCommonFactor(a, b))
