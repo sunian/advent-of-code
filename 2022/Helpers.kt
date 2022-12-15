@@ -35,8 +35,8 @@ mapIndexed : transform a Triple as if it were a list
 Vector3Int.sum : sum 3 components of a vector
 Pair.x, Pair.y : treat a Pair as an (x, y) coordinate
 Triple.x, Triple.y, Triple.z : treat a Triple as an (x, y, z) coordinate
-Pair.plus, Pair.minus : arithmetic on 2 Pairs of Ints
-Vector3Int.plus, Vector3Int.minus : arithmetic on 2 vectors
+Pair.plus, Pair.minus, Pair.times : arithmetic on 2 Pairs of Ints
+Vector3Int.plus, Vector3Int.minus, Vector3Int.times : arithmetic on 2 vectors
 matrixRotateX, matrixRotateY, matrixRotateZ : returns a rotation matrix of a given angle in radians
 Matrix3Int.times : multiply a matrix by another matrix or a vector
 matrixString : pretty print a matrix
@@ -200,11 +200,17 @@ operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> =
 operator fun Pair<Int, Int>.minus(other: Pair<Int, Int>): Pair<Int, Int> =
     this.copy(first - other.first, second - other.second)
 
+operator fun Pair<Int, Int>.times(other: Pair<Int, Int>): Pair<Int, Int> =
+    this.copy(first * other.first, second * other.second)
+
 operator fun Vector3Int.plus(other: Vector3Int): Vector3Int =
     this.copy(first + other.first, second + other.second, third + other.third)
 
 operator fun Vector3Int.minus(other: Vector3Int): Vector3Int =
     this.copy(first - other.first, second - other.second, third - other.third)
+
+operator fun Vector3Int.times(other: Vector3Int): Vector3Int =
+    this.copy(first * other.first, second * other.second, third * other.third)
 
 fun matrixRotateX(radians: Double): Matrix3Int = arrayOf(
     intArrayOf(1, 0, 0),
