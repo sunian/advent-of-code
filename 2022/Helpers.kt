@@ -24,6 +24,7 @@ adjacentAndDiagonalOffsets : offsets for 8 cells adjacent to a cell (includes di
 adjacent4Cells : returns the 4 cells adjacent to the cell (using adjacentOffsets)
 adjacent8Cells : returns the 8 cells adjacent to the cell (using adjacentAndDiagonalOffsets)
 adjacent9Cells : returns the 9 cells adjacent to the cell (including the input cell itself)
+adjacentOffsets3D and adjacentAndDiagonalOffsets3D
 toDotGrid : pretty print a grid of solid/empty cells
 gridToString : pretty print a grid given a mapping
 Pair.row, Pair.col : treat a Pair as a grid position
@@ -169,6 +170,19 @@ fun adjacent9Cells(row: Int, col: Int): List<Pair<Int, Int>> {
         .map { source + it }
 }
 
+val adjacentOffsets3D = arrayOf(
+    Vector3Int(1, 0, 0),
+    Vector3Int(-1, 0, 0),
+    Vector3Int(0, 1, 0),
+    Vector3Int(0, -1, 0),
+    Vector3Int(0, 0, 1),
+    Vector3Int(0, 0, -1),
+)
+val adjacentAndDiagonalOffsets3D: List<Vector3Int> =
+    listOf(-1, 0, 1).let { it * it * it }
+        .toList()
+        .filter { it != Vector3Int(0, 0, 0) }
+
 typealias Vector3Int = Triple<Int, Int, Int>
 typealias Matrix3Int = Array<IntArray>
 
@@ -194,6 +208,17 @@ val <T> Pair<T, T>.col get() = this.second
 val <T> Triple<T, T, T>.x get() = this.first
 val <T> Triple<T, T, T>.y get() = this.second
 val <T> Triple<T, T, T>.z get() = this.third
+operator fun <T> Pair<T, T>.get(index: Int) = when (index) {
+    0 -> first
+    else -> second
+}
+
+operator fun <T> Triple<T, T, T>.get(index: Int) = when (index) {
+    0 -> first
+    1 -> second
+    else -> third
+}
+
 operator fun Pair<Int, Int>.plus(other: Pair<Int, Int>): Pair<Int, Int> =
     this.copy(first + other.first, second + other.second)
 
